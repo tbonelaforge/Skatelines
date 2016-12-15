@@ -33,9 +33,17 @@
     </TableLayout>
 
     <Button
+        android:id="@+id/save_line_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
         android:onClick="saveLine">
+    </Button>
+    <Button
+        android:id="@+id/back_to_main_from_edit_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:onClick="backToMain">
     </Button>
 </LinearLayout>
