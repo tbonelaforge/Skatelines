@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+
 /**
  * Created by tford on 11/22/16.
  */
@@ -39,6 +40,12 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("Here is where we should start the line editor activity...");
         Intent lineEditorActivityIntent = new Intent(this, LineEditorActivity.class);
         startActivity(lineEditorActivityIntent);
+    }
+
+    public void startSessionLog(View view) {
+        System.out.println("Here is where we should start the session log activity...");
+        Intent sessionLogActivityIntent = new Intent(this, SessionLogActivity.class);
+        startActivity(sessionLogActivityIntent);
     }
 
     private class LoadDatabaseTask extends AsyncTask<Void, Void, Void> {

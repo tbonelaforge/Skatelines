@@ -26,4 +26,11 @@
         android:textAllCaps="false"
         android:onClick="startLineEditor">
     </Button>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Session Log"
+        android:textAllCaps="false"
+        android:onClick="startSessionLog">
+        </Button>
 </LinearLayout>

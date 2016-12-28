@@ -46,7 +46,7 @@ public class SaveLineLoader extends AsyncTaskLoader<Boolean> {
             insertLineSkill(lineId, skillObstaclePair.getSkillId(), skillObstaclePair.getObstacleId(), i);
         }
         try {
-            //Thread.currentThread().sleep(2000);
+            Thread.currentThread().sleep(2);
         } catch (InterruptedException e) {
             System.out.println("Inside SaveLineTask, there was a problem sleeping the 'doInBackground' thread!");
         }
@@ -90,15 +90,13 @@ public class SaveLineLoader extends AsyncTaskLoader<Boolean> {
 
     private boolean isValidLineId(int lineId) {
         System.out.println("Inside SaveLineLoader.isValidLineId, got called...");
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM line;", new String[]{});
-        boolean hasFirst = cursor.moveToFirst();
-        if (!hasFirst) {
-            return false;
+        boolean result = LineService.isValidLineId(dbHelper, lineId);
+        if (result) {
+            System.out.printf("Realized the line id %d is valid %n", lineId);
+        } else {
+            System.out.printf("Realized the line id %d is NOT valid %n", lineId);
         }
-        String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
-        System.out.printf("Realized we are trying to edit the line %d: %s %n", lineId, description);
-        return true;
+        return result;
     }
 
     private boolean isValidSkillObstacleSequence(List<SkillObstaclePair> skillObstaclePairs) {
