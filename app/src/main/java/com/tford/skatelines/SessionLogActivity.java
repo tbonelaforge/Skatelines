@@ -5,23 +5,20 @@ import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-
-import com.tford.skatelines.MainActivity;
-import com.tford.skatelines.R;
-import com.tford.skatelines.SkatelinesDbHelper;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class SessionLogActivity extends Activity implements LoaderManager.LoaderCallbacks<List<Session>> {
+public class SessionLogActivity extends Activity implements LoaderManager.LoaderCallbacks<SessionList> {
     private SkatelinesDbHelper dbHelper;
     private Button savingButton;
     private SessionAdapter sessionAdapter;
+    private LineSpinnerAdapter lineSpinnerAdapter;
+    private Spinner spinner;
 
     private static final String EXTRA_SESSION_LINE_ID = "session_line_id";
     private static final String EXTRA_SESSION_DATE = "session_date";
@@ -31,22 +28,23 @@ public class SessionLogActivity extends Activity implements LoaderManager.Loader
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
         setContentView(R.layout.activity_session_log);
         sessionAdapter = new SessionAdapter(this, new ArrayList<Session>());
         ListView sessionListView = (ListView) findViewById(R.id.logged_sessions);
         sessionListView.setAdapter(sessionAdapter);
         savingButton = (Button) findViewById(R.id.save_session_button);
+        spinner = (Spinner) findViewById(R.id.lines_spinner);
+        lineSpinnerAdapter = new LineSpinnerAdapter(this, new ArrayList<Line>());
+        spinner.setAdapter(lineSpinnerAdapter);
         dbHelper = new SkatelinesDbHelper(getApplicationContext());
         getLoaderManager().initLoader(SESSION_LOG_LOADER_ID, new Bundle(), this);
     }
 
     public void saveSession(View view) {
-        EditText sessionLineIdBox = (EditText) findViewById(R.id.session_line_id);
-        int sessionLineId = Integer.valueOf(sessionLineIdBox.getText().toString());
+        Line selectedLine = (Line) spinner.getSelectedItem();
+        int sessionLineId = selectedLine.getId();
         EditText sessionDateBox = (EditText) findViewById(R.id.session_date);
         String sessionDateString = sessionDateBox.getText().toString();
-        System.out.printf("Inside SessionLogActivity.saveSession, I want to save (line_id: %d, date: %s)%n", sessionLineId, sessionDateString);
         LoaderManager loaderManager = getLoaderManager();
         Bundle bundle = new Bundle();
         bundle.putSerializable(EXTRA_SESSION_LINE_ID, new Integer(sessionLineId));
@@ -74,7 +72,7 @@ public class SessionLogActivity extends Activity implements LoaderManager.Loader
     }
 
     @Override
-    public Loader<List<Session>> onCreateLoader(int id, Bundle args) {
+    public Loader<SessionList> onCreateLoader(int id, Bundle args) {
         Integer sessionLineId = (Integer) args.getSerializable(EXTRA_SESSION_LINE_ID);
         String sessionDateString = (String) args.getSerializable(EXTRA_SESSION_DATE);
         SaveSessionLoader saveSessionLoader = new SaveSessionLoader(this, sessionLineId, sessionDateString);
@@ -82,16 +80,17 @@ public class SessionLogActivity extends Activity implements LoaderManager.Loader
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Session>> loader) {
+    public void onLoaderReset(Loader<SessionList> loader) {
         System.out.printf("Inside SessionLogActivity.onLoaderReset, got called!!!");
         sessionAdapter.setSessions(new ArrayList<Session>());
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Session>> loader, List<Session> data) {
+    public void onLoadFinished(Loader<SessionList> loader, SessionList data) {
         if (data != null) {
             System.out.printf("Inside SessionLogActivity.onLoadFinished, got called with data: %s %n", data.toString());
-            sessionAdapter.setSessions(data);
+            sessionAdapter.setSessions(data.getSessions());
+            lineSpinnerAdapter.setLines(data.getLines());
             //findSavingButton().setText("Saved");
         }
     }

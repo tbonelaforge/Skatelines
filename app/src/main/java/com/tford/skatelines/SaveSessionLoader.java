@@ -16,10 +16,11 @@ import java.util.Map;
  * Created by tford on 12/23/16.
  */
 
-public class SaveSessionLoader extends AsyncTaskLoader<List<Session>> {
+public class SaveSessionLoader extends AsyncTaskLoader<SessionList> {
     private Integer lineId;
     private String date;
     private SkatelinesDbHelper dbHelper;
+    private List<Line> lines;
 
     public SaveSessionLoader(Context context, Integer lineId, String date) {
         super(context);
@@ -29,14 +30,15 @@ public class SaveSessionLoader extends AsyncTaskLoader<List<Session>> {
     }
 
     @Override
-    public List<Session> loadInBackground() {
-        List<Session> results;
+    public SessionList loadInBackground() {
+        List<Session> sessions;
+        List<Line> lines = getLines();
+        SessionList sessionList;
         if (lineId == null || date == null) {
-            results = querySessions();
-            return results;
+            sessions = querySessions();
+            sessionList = new SessionList(sessions, lines);
+            return sessionList;
         }
-        System.out.println("Inside SaveSessionLoader.loadInBackground, got called.");
-        System.out.println("Here is where we would actually save the new session record");
         if (!LineService.isValidLineId(dbHelper, lineId)) {
             System.out.printf("The line id %d is not valid. %n", lineId);
             return null;
@@ -45,21 +47,14 @@ public class SaveSessionLoader extends AsyncTaskLoader<List<Session>> {
         if (parsedDate == null) {
             System.out.printf("Inside SaveSessionLoader.loadInBackground, the date %s is not valid. %n", date);
             return null;
-        } else {
-            System.out.printf("Inside SaveSessionLoader.loadInBackground, determined the date %s IS valid -- about to insert a session record. %n", date);
         }
         insertSession(lineId, date);
-        results = querySessions();
-        return results;
+        sessions = querySessions();
+        return new SessionList(sessions, lines);
     }
 
     @Override
-    public void deliverResult(List<Session> data) {
-        if (data != null) {
-            System.out.printf("Inside SaveSessionLoader.deliverResult, got called with data %s", data.toString());
-        } else {
-            System.out.printf("INside SaveSessionLoader.deliverResult, got called with null data! %n");
-        }
+    public void deliverResult(SessionList data) {
         if (isReset()) { // This load is no longer valid, ignore result.
             return;
         }
@@ -70,30 +65,26 @@ public class SaveSessionLoader extends AsyncTaskLoader<List<Session>> {
 
     @Override
     protected void onStartLoading() {
-        System.out.println("Inside SaveSessionLoader.onStartLoading, got called, about to force load......");
         forceLoad();
     }
 
     @Override
     protected void onStopLoading() {
-        System.out.println("Inside SaveSessionLoader.onStopLoading, got called, about to cancel load...");
         cancelLoad();
     }
 
     @Override
     protected void onReset() {
-        System.out.println("Inside SaveSessionLoader.onReset, got called, about to forward to onStopLoading...");
         onStopLoading();
     }
 
     @Override
-    public void onCanceled(List<Session> data) {
-        System.out.println("Inside SaveSessionLoader.onCanceled, got called...");
+    public void onCanceled(SessionList data) {
         super.onCanceled(data);
+        lines = null;
     }
 
     private void insertSession(int lineId, String date) {
-        System.out.printf("Inside SaveSessionLoader, got called with lineId: %d and date %s", lineId, date);
         String[] values = {
                 String.valueOf(lineId),
                 String.valueOf(date)
@@ -114,7 +105,7 @@ public class SaveSessionLoader extends AsyncTaskLoader<List<Session>> {
     }
 
     private List<Session> querySessions() {
-        Map<Integer, Line> linesById = getAllLinesById();
+        Map<Integer, Line> linesById = getLinesById();
         List<Session> sessions = new ArrayList<Session>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(
@@ -134,9 +125,16 @@ public class SaveSessionLoader extends AsyncTaskLoader<List<Session>> {
         return sessions;
     }
 
-    private Map<Integer, Line> getAllLinesById() {
+    private List<Line> getLines() {
+        if (lines == null) {
+            lines = LineService.getAllLines(dbHelper);
+        }
+        return lines;
+    }
+
+    private Map<Integer, Line> getLinesById() {
         Map<Integer, Line> linesById = new HashMap<Integer, Line>();
-        for (Line line : LineService.getAllLines(dbHelper)) {
+        for (Line line : getLines()) {
             linesById.put(Integer.valueOf(line.getId()), line);
         }
         return linesById;
