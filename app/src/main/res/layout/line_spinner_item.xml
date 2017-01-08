@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:textSize="15sp"
     android:gravity="left"
-    android:textColor="#FFFFFF"20
-    />
+    android:textColor="#FFFFFF">
+</TextView>

@@ -109,7 +109,7 @@ public class SaveSessionLoader extends AsyncTaskLoader<SessionList> {
         List<Session> sessions = new ArrayList<Session>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM session;",
+                "SELECT * FROM session order by date desc;",
                 new String[]{}
         );
         if (cursor.moveToFirst()) {
