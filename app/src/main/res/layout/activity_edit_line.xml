@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TableLayout
+        android:id="@+id/line_editor_table1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:stretchColumns="1"
+        android:layout_weight="1">
         <TableRow>
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Line Id"
                 android:textStyle="bold">
@@ -15,7 +18,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Skill/Obstacle Sequence">
+                android:text="Description"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal">
             </TextView>
         </TableRow>
         <TableRow>
@@ -25,25 +30,72 @@
                 android:layout_height="wrap_content">
             </EditText>
             <EditText
+                android:id="@+id/line_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </EditText>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:layout_span="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Skill/Obstacle Sequence"
+                android:textStyle="bold">
+            </TextView>
+        </TableRow>
+        <TableRow>
+            <EditText
                 android:id="@+id/skill_obstacle_sequence"
+                android:layout_span="2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
             </EditText>
         </TableRow>
     </TableLayout>
-
-    <Button
-        android:id="@+id/save_line_button"
+    <TableLayout
+        android:id="@+id/line_editor_table2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
-        android:onClick="saveLine">
-    </Button>
-    <Button
-        android:id="@+id/back_to_main_from_edit_line"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"
-        android:onClick="backToMain">
-    </Button>
-</LinearLayout>
+        android:layout_weight="1"
+        android:stretchColumns="1"
+        android:layout_below="@id/line_editor_table1">
+        <TableRow>
+            <Button
+                android:id="@+id/add_skill_obstacle_pair"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Skill/Obstacle Pair"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_span="2">
+            </Button>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Skill"
+                android:textStyle="bold">
+            </TextView>
+            <Spinner
+                android:id="@+id/line_skill_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </Spinner>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Obstacle"
+                android:textStyle="bold">
+            </TextView>
+            <Spinner
+                android:id="@+id/line_obstacle_spinner"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content">
+            </Spinner>
+        </TableRow>
+    </TableLayout>
+</RelativeLayout>

@@ -55,7 +55,9 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
 
             @Override
             public void afterTextChanged(Editable s) {
-                savingButton.setText("Save");
+                if (savingButton != null) {
+                    savingButton.setText("Save");
+                }
             }
         };
         EditText lineIdBox = (EditText) findViewById(R.id.line_id);
