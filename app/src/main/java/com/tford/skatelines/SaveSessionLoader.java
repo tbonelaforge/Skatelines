@@ -5,6 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.tford.skatelines.model.Line;
+import com.tford.skatelines.model.Session;
+import com.tford.skatelines.service.LineService;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;

@@ -1,5 +1,8 @@
 package com.tford.skatelines;
 
+import com.tford.skatelines.model.Line;
+import com.tford.skatelines.model.Session;
+
 import java.util.List;
 
 /**

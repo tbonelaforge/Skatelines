@@ -14,7 +14,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.tford.skatelines.adapter.ObstacleAdapter;
+import com.tford.skatelines.adapter.SessionAdapter;
+import com.tford.skatelines.adapter.SkillAdapter;
+import com.tford.skatelines.model.Line;
+import com.tford.skatelines.model.Obstacle;
+import com.tford.skatelines.model.Skill;
 
 import org.json.JSONObject;
 
@@ -25,10 +33,13 @@ import java.util.List;
  * Created by tford on 11/28/16.
  */
 
-public class LineEditorActivity extends Activity implements LoaderManager.LoaderCallbacks<Boolean> {
+public class LineEditorActivity extends Activity implements LoaderManager.LoaderCallbacks<LineEditorData> {
     private SkatelinesDbHelper dbHelper;
     private Button savingButton;
     private TextWatcher textWatcher;
+    private SkillAdapter skillAdapter;
+    private ObstacleAdapter obstacleAdapter;
+    private Spinner spinner;
 
     private static final int SAVE_LINE_LOADER_ID = 1;
     private static final String EXTRA_LINE_ID = "line_id";
@@ -64,11 +75,23 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
         lineIdBox.addTextChangedListener(textWatcher);
         EditText skillObstacleSequenceBox = (EditText) findViewById(R.id.skill_obstacle_sequence);
         skillObstacleSequenceBox.addTextChangedListener(textWatcher);
+
+        // Set up Skill Spinner
+        Spinner skillSpinner = (Spinner) findViewById(R.id.skill_spinner);
+        skillAdapter = new SkillAdapter(this, new ArrayList<Skill>());
+        skillSpinner.setAdapter(skillAdapter);
+
+        // Set up Obstacle Spinner
+        Spinner obstacleSpinner = (Spinner) findViewById(R.id.obstacle_spinner);
+        obstacleAdapter = new ObstacleAdapter(this, new ArrayList<Obstacle>());
+        obstacleSpinner.setAdapter(obstacleAdapter);
+
+        // Init Loader.
         getLoaderManager().initLoader(SAVE_LINE_LOADER_ID, new Bundle(), this); // Empty loader should never deliver.
     }
 
     @Override
-    public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+    public Loader<LineEditorData> onCreateLoader(int id, Bundle args) {
         Integer lineId = (Integer) args.getSerializable(EXTRA_LINE_ID);
         ArrayList<SkillObstaclePair> skillObstacleSequence = (ArrayList<SkillObstaclePair>) args.getSerializable(EXTRA_SKILL_OBSTACLE_SEQUENCE);
         SaveLineLoader lineSaveLoader = new SaveLineLoader(this, lineId, skillObstacleSequence);
@@ -76,13 +99,15 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
     }
 
     @Override
-    public void onLoaderReset(Loader<Boolean> loader) {
+    public void onLoaderReset(Loader<LineEditorData> loader) {
 
     }
 
     @Override
-    public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
-        if (data != null && data.booleanValue() == true) {
+    public void onLoadFinished(Loader<LineEditorData> loader, LineEditorData lineEditorData) {
+        skillAdapter.setSkills(lineEditorData.getSkills());
+        obstacleAdapter.setObstacles(lineEditorData.getObstacles());
+        if (lineEditorData.getLineId() != null) {
             findSavingButton().setText("Saved");
         }
     }

@@ -1,14 +1,14 @@
-package com.tford.skatelines;
+package com.tford.skatelines.model;
 
 /**
- * Created by tford on 12/28/16.
+ * Created by tford on 1/22/17.
  */
 
-public class Line {
+public class Obstacle {
     private int id;
     private String description;
 
-    public Line(int id, String description) {
+    public Obstacle(int id, String description) {
         this.id = id;
         this.description = description;
     }

@@ -1,7 +1,10 @@
-package com.tford.skatelines;
+package com.tford.skatelines.service;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.tford.skatelines.SkatelinesDbHelper;
+import com.tford.skatelines.model.Line;
 
 import java.util.ArrayList;
 import java.util.List;

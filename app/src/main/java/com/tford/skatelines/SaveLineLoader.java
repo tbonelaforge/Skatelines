@@ -5,6 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.tford.skatelines.model.Obstacle;
+import com.tford.skatelines.model.Skill;
+import com.tford.skatelines.service.LineService;
+import com.tford.skatelines.service.ObstacleService;
+import com.tford.skatelines.service.SkillService;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +18,7 @@ import java.util.List;
  * Created by tford on 12/2/16.
  */
 
-public class SaveLineLoader extends AsyncTaskLoader<Boolean> {
+public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
     private Integer lineId;
     private ArrayList<SkillObstaclePair> skillObstaclePairs;
     private SkatelinesDbHelper dbHelper;
@@ -25,17 +31,19 @@ public class SaveLineLoader extends AsyncTaskLoader<Boolean> {
     }
 
     @Override
-    public Boolean loadInBackground() {
+    public LineEditorData loadInBackground() {
+        List<Skill> skills = SkillService.getAllSkills(dbHelper);
+        List<Obstacle> obstacles = ObstacleService.getAllObstacles(dbHelper);
         if (lineId == null || skillObstaclePairs == null) {
-            return null;
+            return new LineEditorData(skills, obstacles);
         }
         if (!isValidLineId(lineId)) {
             System.out.printf("The line id %d is not valid. %n", lineId);
-            return Boolean.FALSE;
+            return null;
         }
         if (!isValidSkillObstacleSequence(skillObstaclePairs)) {
             System.out.printf("The skill/obstacle sequence is not valid: %s %n", stringifySkillObstaclePairs());
-            return Boolean.FALSE;
+            return null;
         }
 
         // We have a valid input.
@@ -50,17 +58,17 @@ public class SaveLineLoader extends AsyncTaskLoader<Boolean> {
         } catch (InterruptedException e) {
             System.out.println("Inside SaveLineTask, there was a problem sleeping the 'doInBackground' thread!");
         }
-        return Boolean.TRUE;
+        return new LineEditorData();
     }
 
     @Override
-    public void deliverResult(Boolean data) {
+    public void deliverResult(LineEditorData lineEditorData) {
         System.out.println("Inside SaveLineLoader.deliverResult, got called...");
         if (isReset()) { // This load is no longer valid, ignore result.
             return;
         }
         if (isStarted()) {
-            super.deliverResult(data);
+            super.deliverResult(lineEditorData);
         }
     }
 
@@ -83,9 +91,9 @@ public class SaveLineLoader extends AsyncTaskLoader<Boolean> {
     }
 
     @Override
-    public void onCanceled(Boolean data) {
+    public void onCanceled(LineEditorData lineEditorData) {
         System.out.println("Inside SaveLineLoader.onCanceled, got called...");
-        super.onCanceled(data);
+        super.onCanceled(lineEditorData);
     }
 
     private boolean isValidLineId(int lineId) {

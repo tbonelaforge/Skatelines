@@ -11,6 +11,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import com.tford.skatelines.adapter.SessionAdapter;
+import com.tford.skatelines.model.Line;
+import com.tford.skatelines.model.Session;
+
 import java.util.ArrayList;
 
 public class SessionLogActivity extends Activity implements LoaderManager.LoaderCallbacks<SessionList> {

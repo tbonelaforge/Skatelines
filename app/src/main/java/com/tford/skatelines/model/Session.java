@@ -1,4 +1,4 @@
-package com.tford.skatelines;
+package com.tford.skatelines.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

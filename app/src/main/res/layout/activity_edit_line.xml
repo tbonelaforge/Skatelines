@@ -76,10 +76,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Skill"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                android:layout_marginRight="10dp">
             </TextView>
             <Spinner
-                android:id="@+id/line_skill_spinner"
+                android:id="@+id/skill_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
             </Spinner>
@@ -89,10 +90,11 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:text="Obstacle"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                android:layout_marginRight="10dp">
             </TextView>
             <Spinner
-                android:id="@+id/line_obstacle_spinner"
+                android:id="@+id/obstacle_spinner"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content">
             </Spinner>

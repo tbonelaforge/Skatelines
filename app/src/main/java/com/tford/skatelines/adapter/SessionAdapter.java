@@ -1,4 +1,4 @@
-package com.tford.skatelines;
+package com.tford.skatelines.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.tford.skatelines.R;
+import com.tford.skatelines.model.Session;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
