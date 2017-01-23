@@ -68,7 +68,8 @@
                 android:text="Add Skill/Obstacle Pair"
                 android:textAllCaps="false"
                 android:textStyle="bold"
-                android:layout_span="2">
+                android:layout_span="2"
+                android:onClick="addSkillObstaclePair">
             </Button>
         </TableRow>
         <TableRow>

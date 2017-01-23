@@ -38,7 +38,9 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
     private Button savingButton;
     private TextWatcher textWatcher;
     private SkillAdapter skillAdapter;
+    private Spinner skillSpinner;
     private ObstacleAdapter obstacleAdapter;
+    private Spinner obstacleSpinner;
     private Spinner spinner;
 
     private static final int SAVE_LINE_LOADER_ID = 1;
@@ -77,12 +79,12 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
         skillObstacleSequenceBox.addTextChangedListener(textWatcher);
 
         // Set up Skill Spinner
-        Spinner skillSpinner = (Spinner) findViewById(R.id.skill_spinner);
+        skillSpinner = (Spinner) findViewById(R.id.skill_spinner);
         skillAdapter = new SkillAdapter(this, new ArrayList<Skill>());
         skillSpinner.setAdapter(skillAdapter);
 
         // Set up Obstacle Spinner
-        Spinner obstacleSpinner = (Spinner) findViewById(R.id.obstacle_spinner);
+        obstacleSpinner = (Spinner) findViewById(R.id.obstacle_spinner);
         obstacleAdapter = new ObstacleAdapter(this, new ArrayList<Obstacle>());
         obstacleSpinner.setAdapter(obstacleAdapter);
 
@@ -133,6 +135,22 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
     public void backToMain(View view) {
         Intent mainActivityIntent = new Intent(this, MainActivity.class);
         startActivity(mainActivityIntent);
+    }
+
+    public void addSkillObstaclePair(View view) {
+        System.out.println("Inside addSkillObstaclePair, got called!");
+        Skill selectedSkill = (Skill) skillSpinner.getSelectedItem();
+        Obstacle selectedObstacle = (Obstacle) obstacleSpinner.getSelectedItem();
+        System.out.printf("The selected skill is %d %n", selectedSkill.getId());
+        System.out.printf("The selected obstacle is %d %n", selectedObstacle.getId());
+        String skillObstaclePair = String.format(
+                "(%d,%d)",
+                selectedSkill.getId(),
+                selectedObstacle.getId()
+        );
+        EditText skillObstacleSequenceBox = (EditText) findViewById(R.id.skill_obstacle_sequence);
+        String skillObstacleSequenceString = skillObstacleSequenceBox.getText().toString();
+        if ()
     }
 
     public void onPause() {
