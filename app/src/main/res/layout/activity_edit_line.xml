@@ -101,4 +101,12 @@
             </Spinner>
         </TableRow>
     </TableLayout>
+    <Button
+        android:id="@+id/save_line_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:onClick="saveLine"
+        android:layout_below="@id/line_editor_table2">
+    </Button>
 </RelativeLayout>

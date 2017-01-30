@@ -5,15 +5,15 @@ package com.tford.skatelines.model;
  */
 
 public class Obstacle {
-    private int id;
+    private long id;
     private String description;
 
-    public Obstacle(int id, String description) {
+    public Obstacle(long id, String description) {
         this.id = id;
         this.description = description;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

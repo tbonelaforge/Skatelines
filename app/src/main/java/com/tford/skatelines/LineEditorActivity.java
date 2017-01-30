@@ -46,6 +46,7 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
     private static final int SAVE_LINE_LOADER_ID = 1;
     private static final String EXTRA_LINE_ID = "line_id";
     private static final String EXTRA_SKILL_OBSTACLE_SEQUENCE = "skill_obstacle_sequence";
+    private static final String EXTRA_LINE_DESCRIPTION = "line_description";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,9 +95,11 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
 
     @Override
     public Loader<LineEditorData> onCreateLoader(int id, Bundle args) {
-        Integer lineId = (Integer) args.getSerializable(EXTRA_LINE_ID);
+        Long lineId = (Long) args.getSerializable(EXTRA_LINE_ID);
         ArrayList<SkillObstaclePair> skillObstacleSequence = (ArrayList<SkillObstaclePair>) args.getSerializable(EXTRA_SKILL_OBSTACLE_SEQUENCE);
-        SaveLineLoader lineSaveLoader = new SaveLineLoader(this, lineId, skillObstacleSequence);
+        String lineDescription = (String) args.getSerializable(EXTRA_LINE_DESCRIPTION);
+        //SaveLineLoader lineSaveLoader = new SaveLineLoader(this, lineId, skillObstacleSequence);
+        SaveLineLoader lineSaveLoader = new SaveLineLoader(this, lineId, lineDescription, skillObstacleSequence);
         return lineSaveLoader;
     }
 
@@ -115,11 +118,22 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
     }
 
     public void saveLine(View view) {
+
+        // Extract line id.
         EditText lineIdBox = (EditText) findViewById(R.id.line_id);
-        int lineId = Integer.valueOf(lineIdBox.getText().toString());
+        String lineIdString = lineIdBox.getText().toString();
+        long lineId = 0L; // Code for "create new"
+        if (lineIdString != null && lineIdString.length() >0) {
+            lineId = Long.valueOf(lineIdString);
+        }
+
+        // Extract line description
+        EditText lineDescriptionBox = (EditText) findViewById(R.id.line_description);
+        String lineDescriptionString = lineDescriptionBox.getText().toString();
+
+        // Extract Skill obstacle sequence
         EditText skillObstacleSequenceBox = (EditText) findViewById(R.id.skill_obstacle_sequence);
         String skillObstacleSequenceString = skillObstacleSequenceBox.getText().toString();
-
         ArrayList<SkillObstaclePair> skillObstacleSequence = parseSkillObstacleSequence(skillObstacleSequenceString);
         if (skillObstacleSequence == null) {
             System.out.printf("The skill/obstance sequence cannot be parsed. %n");
@@ -127,7 +141,8 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
         }
         LoaderManager loaderManager = getLoaderManager();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(EXTRA_LINE_ID, new Integer(lineId));
+        bundle.putSerializable(EXTRA_LINE_ID, new Long(lineId));
+        bundle.putSerializable(EXTRA_LINE_DESCRIPTION, lineDescriptionString);
         bundle.putSerializable(EXTRA_SKILL_OBSTACLE_SEQUENCE, skillObstacleSequence);
         loaderManager.restartLoader(SAVE_LINE_LOADER_ID, bundle, this); // Real loader, which should deliver.
     }
@@ -150,7 +165,12 @@ public class LineEditorActivity extends Activity implements LoaderManager.Loader
         );
         EditText skillObstacleSequenceBox = (EditText) findViewById(R.id.skill_obstacle_sequence);
         String skillObstacleSequenceString = skillObstacleSequenceBox.getText().toString();
-        if ()
+        if (skillObstacleSequenceString.length() > 0) {
+            skillObstacleSequenceString += "," + skillObstaclePair;
+        } else {
+            skillObstacleSequenceString += skillObstaclePair;
+        }
+        skillObstacleSequenceBox.setText(skillObstacleSequenceString);
     }
 
     public void onPause() {

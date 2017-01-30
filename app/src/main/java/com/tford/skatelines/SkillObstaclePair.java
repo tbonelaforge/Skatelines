@@ -8,21 +8,21 @@ import java.util.regex.Pattern;
  */
 
 public class SkillObstaclePair {
-    private int skillId;
-    private int obstacleId;
+    private long skillId;
+    private long obstacleId;
 
     private static Pattern orderedPairPattern = Pattern.compile("^\\((\\d+),(\\d+)\\)$");
 
-    public SkillObstaclePair(int skillId, int obstacleId) {
+    public SkillObstaclePair(long skillId, long obstacleId) {
         this.skillId = skillId;
         this.obstacleId = obstacleId;
     }
 
-    public int getSkillId() {
+    public long getSkillId() {
         return skillId;
     }
 
-    public int getObstacleId() {
+    public long getObstacleId() {
         return obstacleId;
     }
 
@@ -47,16 +47,16 @@ public class SkillObstaclePair {
         if (!matcher.find()) {
             return null;
         }
-        int skillId;
-        int obstacleId;
+        long skillId;
+        long obstacleId;
         try {
-            skillId = Integer.valueOf(matcher.group(1));
+            skillId = Long.valueOf(matcher.group(1));
         } catch (NumberFormatException e) {
             System.out.printf("The string %s is not a valid number (expected skill id) %n", matcher.group(1));
             return null;
         }
         try {
-            obstacleId = Integer.valueOf(matcher.group(2));
+            obstacleId = Long.valueOf(matcher.group(2));
         } catch (NumberFormatException e) {
             System.out.printf("The string %s is not a valid number (expected obstacle id) %n", matcher.group(2));
             return null;

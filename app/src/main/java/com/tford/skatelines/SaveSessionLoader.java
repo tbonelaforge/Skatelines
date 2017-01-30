@@ -109,7 +109,7 @@ public class SaveSessionLoader extends AsyncTaskLoader<SessionList> {
     }
 
     private List<Session> querySessions() {
-        Map<Integer, Line> linesById = getLinesById();
+        Map<Long, Line> linesById = getLinesById();
         List<Session> sessions = new ArrayList<Session>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(
@@ -136,10 +136,10 @@ public class SaveSessionLoader extends AsyncTaskLoader<SessionList> {
         return lines;
     }
 
-    private Map<Integer, Line> getLinesById() {
-        Map<Integer, Line> linesById = new HashMap<Integer, Line>();
+    private Map<Long, Line> getLinesById() {
+        Map<Long, Line> linesById = new HashMap<Long, Line>();
         for (Line line : getLines()) {
-            linesById.put(Integer.valueOf(line.getId()), line);
+            linesById.put(Long.valueOf(line.getId()), line);
         }
         return linesById;
     }

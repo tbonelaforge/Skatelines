@@ -10,11 +10,11 @@ import java.util.List;
  */
 
 public class LineEditorData {
-    private Integer lineId;
+    private Long lineId;
     private List<Skill> skills;
     private List<Obstacle> obstacles;
 
-    LineEditorData(Integer lineId, List<Skill> skills, List<Obstacle> obstacles) {
+    LineEditorData(Long lineId, List<Skill> skills, List<Obstacle> obstacles) {
         this.lineId = lineId;
         this.skills = skills;
         this.obstacles = obstacles;
@@ -30,7 +30,11 @@ public class LineEditorData {
         this(null, null);
     }
 
-    public Integer getLineId() {
+    public void setLineId(Long lineId) {
+        this.lineId = lineId;
+    }
+
+    public Long getLineId() {
         return lineId;
     }
 

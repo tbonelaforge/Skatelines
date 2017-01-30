@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.tford.skatelines.model.Line;
 import com.tford.skatelines.model.Obstacle;
 import com.tford.skatelines.model.Skill;
 import com.tford.skatelines.service.LineService;
@@ -19,13 +20,16 @@ import java.util.List;
  */
 
 public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
-    private Integer lineId;
+    private Long lineId;
+    private String lineDescription;
     private ArrayList<SkillObstaclePair> skillObstaclePairs;
     private SkatelinesDbHelper dbHelper;
 
-    public SaveLineLoader(Context context, Integer lineId, ArrayList<SkillObstaclePair> skillObstaclePairs) {
+    //public SaveLineLoader(Context context, Integer lineId, ArrayList<SkillObstaclePair> skillObstaclePairs) {
+    public SaveLineLoader(Context context, Long lineId, String lineDescription, ArrayList<SkillObstaclePair> skillObstaclePairs) {
         super(context);
         this.lineId = lineId;
+        this.lineDescription = lineDescription;
         this.skillObstaclePairs = skillObstaclePairs;
         dbHelper = new SkatelinesDbHelper(context);
     }
@@ -34,18 +38,33 @@ public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
     public LineEditorData loadInBackground() {
         List<Skill> skills = SkillService.getAllSkills(dbHelper);
         List<Obstacle> obstacles = ObstacleService.getAllObstacles(dbHelper);
-        if (lineId == null || skillObstaclePairs == null) {
+        LineEditorData lineEditorData = new LineEditorData(skills, obstacles);
+        if (skillObstaclePairs == null) {
             return new LineEditorData(skills, obstacles);
-        }
-        if (!isValidLineId(lineId)) {
-            System.out.printf("The line id %d is not valid. %n", lineId);
-            return null;
         }
         if (!isValidSkillObstacleSequence(skillObstaclePairs)) {
             System.out.printf("The skill/obstacle sequence is not valid: %s %n", stringifySkillObstaclePairs());
             return null;
         }
+        if (lineId == 0) { // Trying to create new line.
+            Line newLine = createNewLine();
+            lineEditorData.setLineId(newLine.getId());
+            return lineEditorData;
+        }
 
+        // Trying to update existing line.
+        if (!isValidLineId(lineId)) {
+            System.out.printf("The line id %d is not valid. %n", lineId);
+            return null;
+        }
+        updateExistingLine();
+        lineEditorData.setLineId(lineId);
+        return lineEditorData;
+
+
+
+
+        /*
         // We have a valid input.
         deleteLineSkills(lineId);
         for (int i = 0; i < skillObstaclePairs.size(); i++) {
@@ -58,7 +77,8 @@ public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
         } catch (InterruptedException e) {
             System.out.println("Inside SaveLineTask, there was a problem sleeping the 'doInBackground' thread!");
         }
-        return new LineEditorData();
+        return new LineEditorData(skills, obstacles);
+        */
     }
 
     @Override
@@ -96,7 +116,41 @@ public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
         super.onCanceled(lineEditorData);
     }
 
-    private boolean isValidLineId(int lineId) {
+    private void updateExistingLine() {
+        LineService.updateLineDescription(dbHelper, lineId, lineDescription);
+        deleteLineSkills(lineId);
+        insertSkillObstacleRows(lineId);
+        /*
+        for (int i = 0; i < skillObstaclePairs.size(); i++) {
+            System.out.printf("Inside SaveLineLoader.loadInBackground, considering skillObstaclePair %d %n", i);
+            SkillObstaclePair skillObstaclePair = skillObstaclePairs.get(i);
+            insertLineSkill(lineId, skillObstaclePair.getSkillId(), skillObstaclePair.getObstacleId(), i);
+        }
+        */
+        /*
+        try {
+            Thread.currentThread().sleep(2);
+        } catch (InterruptedException e) {
+            System.out.println("Inside SaveLineTask, there was a problem sleeping the 'doInBackground' thread!");
+        }
+        */
+    }
+
+    private Line createNewLine() {
+        Line line = LineService.insertLine(dbHelper, lineDescription);
+        insertSkillObstacleRows(line.getId());
+        return line;
+    }
+
+    private void insertSkillObstacleRows(long lineId) {
+        for (int i = 0; i < skillObstaclePairs.size(); i++) {
+            System.out.printf("Inside SaveLineLoader.loadInBackground, considering skillObstaclePair %d %n", i);
+            SkillObstaclePair skillObstaclePair = skillObstaclePairs.get(i);
+            insertLineSkill(lineId, skillObstaclePair.getSkillId(), skillObstaclePair.getObstacleId(), i);
+        }
+    }
+
+    private boolean isValidLineId(long lineId) {
         System.out.println("Inside SaveLineLoader.isValidLineId, got called...");
         boolean result = LineService.isValidLineId(dbHelper, lineId);
         if (result) {
@@ -111,14 +165,14 @@ public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
         System.out.println("Inside SaveLineLoader.isValidSkillObstacleSequence, got called...");
         for (int i = 0; i < skillObstaclePairs.size(); i++) {
             SkillObstaclePair skillObstaclePair = skillObstaclePairs.get(i);
-            int skillId = skillObstaclePair.getSkillId();
+            long skillId = skillObstaclePair.getSkillId();
             Cursor cursor = querySkillById(skillId);
             if (cursor == null) {
                 return false;
             }
             String skillDescription = cursor.getString(cursor.getColumnIndexOrThrow("description"));
             System.out.printf("Realized we are specifying skill %d: %s at index %d %n", skillId, skillDescription, i);
-            int obstacleId = skillObstaclePair.getObstacleId();
+            long obstacleId = skillObstaclePair.getObstacleId();
             cursor = queryTransitionById(obstacleId);
             if (cursor == null) {
                 return false;
@@ -129,7 +183,7 @@ public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
         return true;
     }
 
-    private Cursor querySkillById(int skillId) {
+    private Cursor querySkillById(long skillId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM skill where id = ?", new String[]{String.valueOf(skillId)});
         boolean hasFirst = cursor.moveToFirst();
@@ -139,7 +193,7 @@ public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
         return cursor;
     }
 
-    private Cursor queryTransitionById(int transitionId) {
+    private Cursor queryTransitionById(long transitionId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM transition where id = ?", new String[]{String.valueOf(transitionId)});
         boolean hasFirst = cursor.moveToFirst();
@@ -161,12 +215,12 @@ public class SaveLineLoader extends AsyncTaskLoader<LineEditorData> {
         return printable;
     }
 
-    private void deleteLineSkills(int lineId) {
+    private void deleteLineSkills(long lineId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.execSQL("DELETE FROM line_skill where line_id = ?", new String[]{String.valueOf(lineId)});
     }
 
-    private void insertLineSkill(int lineId, int skillId, int obstacleId, int pos) {
+    private void insertLineSkill(long lineId, long skillId, long obstacleId, int pos) {
         String[] values = {
                 String.valueOf(lineId),
                 String.valueOf(skillId),

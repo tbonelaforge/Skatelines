@@ -46,12 +46,12 @@ public class SessionLogActivity extends Activity implements LoaderManager.Loader
 
     public void saveSession(View view) {
         Line selectedLine = (Line) spinner.getSelectedItem();
-        int sessionLineId = selectedLine.getId();
+        long sessionLineId = selectedLine.getId();
         EditText sessionDateBox = (EditText) findViewById(R.id.session_date);
         String sessionDateString = sessionDateBox.getText().toString();
         LoaderManager loaderManager = getLoaderManager();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(EXTRA_SESSION_LINE_ID, new Integer(sessionLineId));
+        bundle.putSerializable(EXTRA_SESSION_LINE_ID, new Long(sessionLineId));
         bundle.putSerializable(EXTRA_SESSION_DATE, sessionDateString);
         loaderManager.restartLoader(SESSION_LOG_LOADER_ID, bundle, this); // Real loader, which should deliver.
     }

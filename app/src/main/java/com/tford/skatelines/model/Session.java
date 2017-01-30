@@ -8,24 +8,24 @@ import java.util.Date;
  */
 
 public class Session {
-    private int id;
-    private int lineId;
+    private long id;
+    private long lineId;
     private Date date;
     private Line line;
 
     public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    public Session(int id, int lineId, Date date) {
+    public Session(long id, long lineId, Date date) {
         this.id = id;
         this.lineId = lineId;
         this.date = date;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public int getLineId() {
+    public long getLineId() {
         return lineId;
     }
 
